@@ -64,7 +64,12 @@ This function should only modify configuration layer settings."
      treemacs
      (ranger :variables
              ranger-show-preview t)
+     (prettier
+      :variables
+      prettier-enable-on-save t
+      )
      )
+
 
    ;; List of additional packages that will be installed without being wrapped
    ;; in a layer (generally the packages are installed only and should still be
@@ -579,6 +584,29 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
+  ;; Force debug mode for Prettier:
+  (setq prettier-js-args '("--debug"))
+  ;; Force aggressive-indent-mode for any programming specific modes:
+  (setq aggressive-indent-indentation 2) ; Set indentation to 2 spaces
+  (add-hook 'prog-mode-hook #'aggressive-indent-mode)
+  ;; Force Spacemacs to load the correct Node version of 'Prettier':
+  (setq prettier-js-command "/home/sam/.nvm/versions/node/v18.0.0/bin/prettier")
+  ;; Force Spacemacs to use the '~/.prettierrc' config file:
+  (setq prettier-js-config-file "~/.prettierrc")
+  ;; Force Spacemacs to use 'Prettier' for multiple JS and TS modes:
+  (defun setup-prettier ()
+    "Setup Prettier for JavaScript and TypeScript modes."
+    (interactive)
+    (message "Setting up Prettier") ; Add this line for debugging
+    (add-hook 'js2-mode-hook #'prettier-js-mode)
+    (add-hook 'typescript-tsx-mode-hook #'prettier-js-mode))
+  (add-hook 'spacemacs-post-user-config-hook 'setup-prettier)
+  ;; Force Spacemacs  to use 'Prettier' on .tsx files
+  ;; Force Spacemacs to use 'Prettier' on .tsx files in both modes
+  (with-eval-after-load 'typescript-mode
+    (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode))
+    (add-hook 'typescript-mode-hook #'prettier-eslint))
+  (add-hook 'typescript-tsx-mode-hook #'prettier-eslint)
   ;; Force Spacemacs to load the correct Node version from shell:
   (use-package exec-path-from-shell
     :ensure t
