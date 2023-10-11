@@ -51,8 +51,8 @@ This function should only modify configuration layer settings."
      multiple-cursors
      org
      (shell :variables
-             shell-default-height 30
-             shell-default-position 'bottom)
+            shell-default-height 30
+            shell-default-position 'bottom)
      spell-checking
      syntax-checking
      version-control
@@ -64,10 +64,7 @@ This function should only modify configuration layer settings."
      treemacs
      (ranger :variables
              ranger-show-preview t)
-     (prettier
-      :variables
-      prettier-enable-on-save t
-      )
+     spacemacs-prettier
      )
 
 
@@ -586,27 +583,41 @@ Put your configuration code here, except for variables that should be set
 before packages are loaded."
   ;; Force debug mode for Prettier:
   (setq prettier-js-args '("--debug"))
-  ;; Force aggressive-indent-mode for any programming specific modes:
-  (setq aggressive-indent-indentation 2) ; Set indentation to 2 spaces
-  (add-hook 'prog-mode-hook #'aggressive-indent-mode)
   ;; Force Spacemacs to load the correct Node version of 'Prettier':
   (setq prettier-js-command "/home/sam/.nvm/versions/node/v18.0.0/bin/prettier")
-  ;; Force Spacemacs to use the '~/.prettierrc' config file:
-  (setq prettier-js-config-file "~/.prettierrc")
-  ;; Force Spacemacs to use 'Prettier' for multiple JS and TS modes:
-  (defun setup-prettier ()
-    "Setup Prettier for JavaScript and TypeScript modes."
-    (interactive)
-    (message "Setting up Prettier") ; Add this line for debugging
-    (add-hook 'js2-mode-hook #'prettier-js-mode)
-    (add-hook 'typescript-tsx-mode-hook #'prettier-js-mode))
-  (add-hook 'spacemacs-post-user-config-hook 'setup-prettier)
-  ;; Force Spacemacs  to use 'Prettier' on .tsx files
-  ;; Force Spacemacs to use 'Prettier' on .tsx files in both modes
-  (with-eval-after-load 'typescript-mode
-    (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode))
-    (add-hook 'typescript-mode-hook #'prettier-eslint))
-  (add-hook 'typescript-tsx-mode-hook #'prettier-eslint)
+  ;; Taken from here:
+  ;; https://jaketrent.com/post/prettier-on-spacemacs/
+  ;; NOTE:
+  ;; This requires you to make sure that you use the following commands to grab the 'spacemacs-prettier' layer:
+  ;; cd ~/.emacs.d/private/
+  ;; git clone git@github.com:praveenperera/spacemacs-prettier.git
+  ;; Once that is done, then this config should be good to go as long as Prettier was installed globally via 'npm install -g prettier'
+  ;; which should install it within whatever version of Node is being used via 'nvm' above ^
+  ;; Force Spacemacs to add a hook for every JS based mode:
+  (add-hook 'js2-mode-hook 'prettier-js-mode)
+  (add-hook 'web-mode-hook 'prettier-js-mode)
+  (add-hook 'typescript-tsx-mode-hook 'prettier-js-mode)
+  (add-hook 'typescript-mode-hook 'prettier-js-mode)
+  ;; Force Spacemacs to use some defaults for Prettier without having to use a '.prettierrc' file:
+  (setq prettier-js-args '(
+                           "--single-quote"
+                           "--tab-width" "2"
+                           "--print-width" "80"
+                           "--bracket-same-line"
+                           ))
+  ;; Force Spacemacs to have specific indentation levels for specific modes:
+  (defun my/customize-indentation-for-modes ()
+    "Customize indentation for specific modes"
+    (setq-local typescript-indent-level 2)
+    (setq-local typescript-tsx-indent-level 2)
+    (setq-local web-mode-markup-indent-offset 2)
+    (setq-local web-mode-code-indent-offset 2)
+    (setq-local web-mode-css-indent-offset 2))
+
+  (add-hook 'typescript-mode-hook 'my/customize-indentation-for-modes)
+  (add-hook 'typescript-tsx-mode-hook 'my/customize-indentation-for-modes)
+  (add-hook 'web-mode-hook 'my/customize-indentation-for-modes)
+
   ;; Force Spacemacs to load the correct Node version from shell:
   (use-package exec-path-from-shell
     :ensure t
@@ -711,7 +722,7 @@ before packages are loaded."
           '("a" "s" "d" "f" "h" "j" "k" "l"))
     :bind
     ([remap other-window] . switch-window))
-)
+  )
 
 
 ;; Do not write anything past this comment. This is where Emacs will
