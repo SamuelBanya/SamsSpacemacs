@@ -631,6 +631,20 @@ before packages are loaded."
   ;; Vterm:
   ;; Set the default shell to 'bash':
   (setq vterm-shell "/bin/bash")
+  ;; Window Splitting Functions (Horizontal And Vertical)
+  (defun split-and-follow-horizontally ()
+    (interactive)
+    (split-window-below)
+    (balance-windows)
+    (other-window 1))
+  (global-set-key (kbd "C-x 2") 'split-and-follow-horizontally)
+
+  (defun split-and-follow-vertically ()
+    (interactive)
+    (split-window-right)
+    (balance-windows)
+    (other-window 1))
+  (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
   ;; Org Mode Specific Config Sections:
   ;; Wrap the entire Org Mode config sections with the following
   ;; Reason being is that the FAQ advises this (https://www.spacemacs.org/doc/FAQ.html)
