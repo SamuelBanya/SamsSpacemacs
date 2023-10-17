@@ -59,7 +59,7 @@ This function should only modify configuration layer settings."
      themes-megapack
      (typescript :variables
                  typescript-linter 'eslint
-                 typescript-fmt-tool 'prettier
+                 typescript-fmt-tool 'spacemacs-prettier
                  typescript-backend 'lsp)
      treemacs
      (ranger :variables
@@ -583,12 +583,44 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
+  ;; LSP Funtime:
+  ;; First make sure 'ts-ls' is installed via 'npm install -g typescript-language-server'
+  ;; Then, the following config will take care of loading 'ts-ls' LSP server for Typescript files:
+  ;; Configure the language server for TypeScript files
+  (with-eval-after-load 'lsp-mode
+    (add-to-list 'lsp-language-id-configuration '(web-mode . "javascript"))
+    (lsp-register-client
+     (make-lsp-client :new-connection (lsp-stdio-connection '("typescript-language-server" "--stdio"))
+                      :major-modes '(web-mode)
+                      :server-id 'ts-ls)))
+  ;; Remove Evil Mode for 'vterm':
+  (defun disable-evil-keys-in-vterm ()
+    "Disable Evil mode keys for Vterm."
+    (evil-set-initial-state 'vterm-mode 'emacs)
+    (define-key vterm-mode-map [remap evil-insert] nil)
+    (define-key vterm-mode-map [remap evil-append] nil)
+    (define-key vterm-mode-map [remap evil-change] nil)
+    (define-key vterm-mode-map [remap evil-change-line] nil)
+    (define-key vterm-mode-map [remap evil-delete] nil)
+    (define-key vterm-mode-map [remap evil-delete-char] nil)
+    (define-key vterm-mode-map [remap evil-delete-line] nil)
+    (define-key vterm-mode-map [remap evil-change-whole-line] nil)
+    (define-key vterm-mode-map [remap evil-yank] nil)
+    (define-key vterm-mode-map [remap evil-paste-before] nil)
+    (define-key vterm-mode-map [remap evil-paste-after] nil)
+    (define-key vterm-mode-map [remap evil-undo] nil)
+    (define-key vterm-mode-map [remap evil-redo] nil))
+
+  (add-hook 'vterm-mode-hook 'disable-evil-keys-in-vterm)
   ;; Force Ranger to show hidden files by default:
   (setq ranger-show-hidden t)
   ;; Force debug mode for Prettier:
   (setq prettier-js-args '("--debug"))
   ;; Force Spacemacs to load the correct Node version of 'Prettier':
-  (setq prettier-js-command "/home/sam/.nvm/versions/node/v18.0.0/bin/prettier")
+  ;; NOTE: This is for Node Version 18
+  ;; (setq prettier-js-command "/home/sam/.nvm/versions/node/v18.0.0/bin/prettier")
+  ;; NOTE: Changing to Node version 20.8.1 due to LTS version of Node moving to 20.8.1 soon:
+  (setq prettier-js-command "/home/sam/.nvm/versions/node/v20.8.1/bin/prettier")
   ;; Taken from here:
   ;; https://jaketrent.com/post/prettier-on-spacemacs/
   ;; NOTE:
@@ -629,7 +661,9 @@ before packages are loaded."
     (when (memq window-system '(mac ns x))
       (exec-path-from-shell-initialize)))
   ;; Forcing Spacemacs to use Node 18 which I installed via 'nvm':
-  (add-to-list 'exec-path "/home/sam/.nvm/versions/node/v18.0.0/bin")
+  ;; (add-to-list 'exec-path "/home/sam/.nvm/versions/node/v18.0.0/bin")
+  ;; Forcing Spacemacs to use Node 20.8.1:
+  (add-to-list 'exec-path "/home/sam/.nvm/versions/node/v20.8.1/bin")
   ;; Forcing Spacemacs to not create lockfiles:
   (setq create-lockfiles nil)
   ;; Vterm:
