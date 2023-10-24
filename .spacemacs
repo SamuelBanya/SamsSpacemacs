@@ -684,6 +684,8 @@ before packages are loaded."
     (other-window 1))
   (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
   ;; Org Mode Specific Config Sections:
+  ;; Disable line truncation in Org Mode
+  (setq org-startup-truncated nil)
   ;; Wrap the entire Org Mode config sections with the following
   ;; Reason being is that the FAQ advises this (https://www.spacemacs.org/doc/FAQ.html)
   (with-eval-after-load 'org
