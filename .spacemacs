@@ -654,6 +654,13 @@ before packages are loaded."
   (add-hook 'typescript-tsx-mode-hook 'my/customize-indentation-for-modes)
   (add-hook 'web-mode-hook 'my/customize-indentation-for-modes)
 
+  ;; Force 'js-2' mode to have '2 spaces' for indentation:
+  (defun my-customize-js2-indentation ()
+    "Customize js2-mode indentation to 2 spaces."
+    (setq js2-basic-offset 2))
+
+  (add-hook 'js2-mode-hook 'my-customize-js2-indentation)
+
   ;; Force Spacemacs to load the correct Node version from shell:
   (use-package exec-path-from-shell
     :ensure t
@@ -683,6 +690,8 @@ before packages are loaded."
     (balance-windows)
     (other-window 1))
   (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
+  ;; Get rid of 'Flyspell' as its annoying, and I don't suck at spelling:
+  (setq-default dotspacemacs-checker-disable 'flyspell)
   ;; Org Mode Specific Config Sections:
   ;; Disable line truncation in Org Mode
   (setq org-startup-truncated nil)
