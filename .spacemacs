@@ -583,6 +583,25 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
+  ;; Setting Up Support For 'Razor' Templates:
+  ;; Razor-specific configurations for web-mode
+  (setq web-mode-engines-alist
+        '(("razor" . "\\.cshtml\\'")))
+
+  ;; Set web-mode indentation offset for .razor files:
+  (setq web-mode-markup-indent-offset 2)
+
+  ;; Associate web-mode with .razor files
+  (add-to-list 'auto-mode-alist '("\\.razor\\'" . web-mode))
+
+  ;; Set web-mode indentation offsets for .razor files
+  (add-hook 'web-mode-hook
+            (lambda ()
+              (when (string-equal "razor" (file-name-extension buffer-file-name))
+                (setq web-mode-markup-indent-offset 2
+                      web-mode-css-indent-offset 2
+                      web-mode-code-indent-offset 2))))
+
   ;; LSP Funtime:
   ;; First make sure 'ts-ls' is installed via 'npm install -g typescript-language-server'
   ;; Then, the following config will take care of loading 'ts-ls' LSP server for Typescript files:
@@ -620,7 +639,23 @@ before packages are loaded."
   ;; NOTE: This is for Node Version 18
   ;; (setq prettier-js-command "/home/sam/.nvm/versions/node/v18.0.0/bin/prettier")
   ;; NOTE: Changing to Node version 20.8.1 due to LTS version of Node moving to 20.8.1 soon:
-  (setq prettier-js-command "/home/sam/.nvm/versions/node/v20.8.1/bin/prettier")
+  ;; (setq prettier-js-command "/home/sam/.nvm/versions/node/v20.8.1/bin/prettier")
+
+  ;; Dynamic Prettier command based on nvm Node.js version
+  (defun get-nvm-node-version ()
+    "Get the currently active Node.js version managed by nvm."
+    (string-trim (shell-command-to-string "nvm current")))
+
+  (defun set-prettier-js-command ()
+    "Set prettier-js-command based on the current Node.js version."
+    (setq prettier-js-command (concat "/home/sam/.nvm/versions/node/" (get-nvm-node-version) "/bin/prettier")))
+
+  ;; Force Spacemacs to load the correct Node version of 'Prettier':
+  (set-prettier-js-command)
+
+  ;; Add a hook to update prettier-js-command whenever Node.js version changes
+  (add-hook 'after-init-hook #'set-prettier-js-command)
+
   ;; Taken from here:
   ;; https://jaketrent.com/post/prettier-on-spacemacs/
   ;; NOTE:
@@ -801,7 +836,7 @@ This function is called at the very end of Spacemacs initialization."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(ac-ispell afternoon-theme alect-themes ample-theme ample-zen-theme anti-zenburn-theme apropospriate-theme auto-complete auto-dictionary auto-yasnippet badwolf-theme birds-of-paradise-plus-theme browse-at-remote bubbleberry-theme busybee-theme cherry-blossom-theme chocolate-theme clues-theme color-theme-sanityinc-solarized color-theme-sanityinc-tomorrow company-web web-completion-data cyberpunk-theme dakrone-theme darkmine-theme darkokai-theme darktooth-theme django-theme doom-themes dracula-theme emmet-mode esh-help eshell-prompt-extras eshell-z espresso-theme evil-org exotica-theme eziam-themes farmhouse-themes flatland-theme flatui-theme flycheck-pos-tip pos-tip flyspell-correct-helm flyspell-correct fuzzy gandalf-theme gh-md git-gutter-fringe fringe-helper git-gutter gnuplot gotham-theme grandshell-theme graphql-mode gruber-darker-theme gruvbox-theme hc-zenburn-theme helm-c-yasnippet helm-company company helm-css-scss helm-lsp helm-org-rifle hemisu-theme heroku-theme impatient-mode htmlize inkpot-theme ir-black-theme jazz-theme jbeans-theme kaolin-themes light-soap-theme lsp-origami origami lsp-treemacs lsp-ui lsp-mode lush-theme madhat2r-theme majapahit-themes markdown-toc material-theme minimal-theme mmm-mode modus-themes moe-theme molokai-theme monochrome-theme monokai-theme multi-term multi-vterm xref mustang-theme mwim naquadah-theme noctilux-theme obsidian-theme occidental-theme oldlace-theme omtose-phellack-theme org-cliplink org-contrib org-download org-mime org-pomodoro alert log4e gntp org-present org-projectile org-project-capture org-category-capture org-rich-yank organic-green-theme orgit-forge orgit org phoenix-dark-mono-theme phoenix-dark-pink-theme planet-theme professional-theme pug-mode purple-haze-theme railscasts-theme rebecca-theme reverse-theme sass-mode haml-mode scss-mode seti-theme shell-pop slim-mode smyx-theme soft-charcoal-theme soft-morning-theme soft-stone-theme solarized-theme soothe-theme autothemer spacegray-theme subatomic-theme subatomic256-theme sublime-themes sunny-day-theme tagedit tango-2-theme tango-plus-theme tangotango-theme tao-theme terminal-here toxi-theme twilight-anti-bright-theme twilight-bright-theme twilight-theme ujelly-theme underwater-theme unfill web-mode white-sand-theme xterm-color yasnippet-snippets zen-and-art-theme zenburn-theme zonokai-emacs ranger switch-window forge yaml markdown-mode ghub closql emacsql treepy git-link git-messenger git-modes git-timemachine gitignore-templates helm-git-grep helm-ls-git smeargle tern treemacs-magit magit seq magit-section git-commit with-editor transient counsel tide js-doc js2-refactor yasnippet multiple-cursors json-mode json-navigator hierarchy json-reformat json-snatcher livid-mode nodejs-repl npm-mode prettier-js skewer-mode js2-mode simple-httpd typescript-mode web-beautify no-littering org-kanban vterm ws-butler writeroom-mode winum which-key volatile-highlights vim-powerline vi-tilde-fringe uuidgen use-package undo-tree treemacs-projectile treemacs-persp treemacs-icons-dired treemacs-evil toc-org term-cursor symon symbol-overlay string-inflection string-edit-at-point spacemacs-whitespace-cleanup spacemacs-purpose-popwin spaceline space-doc restart-emacs request rainbow-delimiters quickrun popwin pcre2el password-generator paradox overseer org-superstar open-junk-file nameless multi-line macrostep lorem-ipsum link-hint inspector info+ indent-guide hybrid-mode hungry-delete holy-mode hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt helm-xref helm-themes helm-swoop helm-purpose helm-projectile helm-org helm-mode-manager helm-make helm-descbinds helm-ag google-translate golden-ratio flycheck-package flycheck-elsa flx-ido fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-evilified-state evil-escape evil-easymotion evil-collection evil-cleverparens evil-args evil-anzu eval-sexp-fu emr elisp-slime-nav elisp-def editorconfig dumb-jump drag-stuff dotenv-mode dired-quick-sort diminish devdocs define-word column-enforce-mode clean-aindent-mode centered-cursor-mode auto-highlight-symbol auto-compile all-the-icons aggressive-indent ace-link ace-jump-helm-line)))
+   '(exec-path-from-shell ac-ispell afternoon-theme alect-themes ample-theme ample-zen-theme anti-zenburn-theme apropospriate-theme auto-complete auto-dictionary auto-yasnippet badwolf-theme birds-of-paradise-plus-theme browse-at-remote bubbleberry-theme busybee-theme cherry-blossom-theme chocolate-theme clues-theme color-theme-sanityinc-solarized color-theme-sanityinc-tomorrow company-web web-completion-data cyberpunk-theme dakrone-theme darkmine-theme darkokai-theme darktooth-theme django-theme doom-themes dracula-theme emmet-mode esh-help eshell-prompt-extras eshell-z espresso-theme evil-org exotica-theme eziam-themes farmhouse-themes flatland-theme flatui-theme flycheck-pos-tip pos-tip flyspell-correct-helm flyspell-correct fuzzy gandalf-theme gh-md git-gutter-fringe fringe-helper git-gutter gnuplot gotham-theme grandshell-theme graphql-mode gruber-darker-theme gruvbox-theme hc-zenburn-theme helm-c-yasnippet helm-company company helm-css-scss helm-lsp helm-org-rifle hemisu-theme heroku-theme impatient-mode htmlize inkpot-theme ir-black-theme jazz-theme jbeans-theme kaolin-themes light-soap-theme lsp-origami origami lsp-treemacs lsp-ui lsp-mode lush-theme madhat2r-theme majapahit-themes markdown-toc material-theme minimal-theme mmm-mode modus-themes moe-theme molokai-theme monochrome-theme monokai-theme multi-term multi-vterm xref mustang-theme mwim naquadah-theme noctilux-theme obsidian-theme occidental-theme oldlace-theme omtose-phellack-theme org-cliplink org-contrib org-download org-mime org-pomodoro alert log4e gntp org-present org-projectile org-project-capture org-category-capture org-rich-yank organic-green-theme orgit-forge orgit org phoenix-dark-mono-theme phoenix-dark-pink-theme planet-theme professional-theme pug-mode purple-haze-theme railscasts-theme rebecca-theme reverse-theme sass-mode haml-mode scss-mode seti-theme shell-pop slim-mode smyx-theme soft-charcoal-theme soft-morning-theme soft-stone-theme solarized-theme soothe-theme autothemer spacegray-theme subatomic-theme subatomic256-theme sublime-themes sunny-day-theme tagedit tango-2-theme tango-plus-theme tangotango-theme tao-theme terminal-here toxi-theme twilight-anti-bright-theme twilight-bright-theme twilight-theme ujelly-theme underwater-theme unfill web-mode white-sand-theme xterm-color yasnippet-snippets zen-and-art-theme zenburn-theme zonokai-emacs ranger switch-window forge yaml markdown-mode ghub closql emacsql treepy git-link git-messenger git-modes git-timemachine gitignore-templates helm-git-grep helm-ls-git smeargle tern treemacs-magit magit seq magit-section git-commit with-editor transient counsel tide js-doc js2-refactor yasnippet multiple-cursors json-mode json-navigator hierarchy json-reformat json-snatcher livid-mode nodejs-repl npm-mode prettier-js skewer-mode js2-mode simple-httpd typescript-mode web-beautify no-littering org-kanban vterm ws-butler writeroom-mode winum which-key volatile-highlights vim-powerline vi-tilde-fringe uuidgen use-package undo-tree treemacs-projectile treemacs-persp treemacs-icons-dired treemacs-evil toc-org term-cursor symon symbol-overlay string-inflection string-edit-at-point spacemacs-whitespace-cleanup spacemacs-purpose-popwin spaceline space-doc restart-emacs request rainbow-delimiters quickrun popwin pcre2el password-generator paradox overseer org-superstar open-junk-file nameless multi-line macrostep lorem-ipsum link-hint inspector info+ indent-guide hybrid-mode hungry-delete holy-mode hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt helm-xref helm-themes helm-swoop helm-purpose helm-projectile helm-org helm-mode-manager helm-make helm-descbinds helm-ag google-translate golden-ratio flycheck-package flycheck-elsa flx-ido fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-evilified-state evil-escape evil-easymotion evil-collection evil-cleverparens evil-args evil-anzu eval-sexp-fu emr elisp-slime-nav elisp-def editorconfig dumb-jump drag-stuff dotenv-mode dired-quick-sort diminish devdocs define-word column-enforce-mode clean-aindent-mode centered-cursor-mode auto-highlight-symbol auto-compile all-the-icons aggressive-indent ace-link ace-jump-helm-line)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
