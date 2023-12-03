@@ -636,11 +636,6 @@ before packages are loaded."
   ;; Force debug mode for Prettier:
   (setq prettier-js-args '("--debug"))
   ;; Force Spacemacs to load the correct Node version of 'Prettier':
-  ;; NOTE: This is for Node Version 18
-  ;; (setq prettier-js-command "/home/sam/.nvm/versions/node/v18.0.0/bin/prettier")
-  ;; NOTE: Changing to Node version 20.8.1 due to LTS version of Node moving to 20.8.1 soon:
-  ;; (setq prettier-js-command "/home/sam/.nvm/versions/node/v20.8.1/bin/prettier")
-
   ;; Dynamic Prettier command based on nvm Node.js version
   (defun get-nvm-node-version ()
     "Get the currently active Node.js version managed by nvm."
