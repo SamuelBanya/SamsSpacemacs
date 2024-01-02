@@ -64,7 +64,6 @@ This function should only modify configuration layer settings."
      (ranger :variables
              ranger-show-preview t)
      csharp
-     editorconfig
      )
 
    ;; List of additional packages that will be installed without being wrapped
@@ -78,7 +77,8 @@ This function should only modify configuration layer settings."
    ;; NOTE: Adding sqlite3 to force Spacemacs to shut up about Magit Mode:
    dotspacemacs-additional-packages '(
                                       sqlite3
-                                      vterm)
+                                      vterm
+                                      editorconfig)
 
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -582,6 +582,14 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
+  (setq-default dotspacemacs-configuration-layers
+                '((csharp :variables
+                          csharp-backend 'lsp
+                          lsp-csharp-server-path "/opt/homebrew/Cellar/omnisharp-mono/1.35.3/bin/omnisharp")))
+
+  ;; Use 'editorconfig' project:
+  (editorconfig-mode 1)
+
   ;; Setting default font size to 13 point
   (setq-default dotspacemacs-default-font '("Source Code Pro"
                                             :size 13
