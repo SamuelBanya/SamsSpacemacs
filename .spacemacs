@@ -59,12 +59,10 @@ This function should only modify configuration layer settings."
      themes-megapack
      (typescript :variables
                  typescript-linter 'eslint
-                 typescript-fmt-tool 'spacemacs-prettier
                  typescript-backend 'lsp)
      treemacs
      (ranger :variables
              ranger-show-preview t)
-     spacemacs-prettier
      )
 
 
@@ -583,6 +581,18 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
+  ;; Setting default font size to 13 point
+  (setq-default dotspacemacs-default-font '("Source Code Pro"
+                                            :size 13
+                                            :weight normal
+                                            :width normal
+                                            :powerline-scale 1.1))
+
+  ;; Apply the font settings
+  (spacemacs/set-default-font dotspacemacs-default-font)
+  (spacemacs/emacs-custom-settings)
+
+
   ;; Setting Up Support For 'Razor' Templates:
   ;; Razor-specific configurations for web-mode
   (setq web-mode-engines-alist
@@ -633,44 +643,7 @@ before packages are loaded."
   (add-hook 'vterm-mode-hook 'disable-evil-keys-in-vterm)
   ;; Force Ranger to show hidden files by default:
   (setq ranger-show-hidden t)
-  ;; Force debug mode for Prettier:
-  (setq prettier-js-args '("--debug"))
-  ;; Force Spacemacs to load the correct Node version of 'Prettier':
-  ;; Dynamic Prettier command based on nvm Node.js version
-  (defun get-nvm-node-version ()
-    "Get the currently active Node.js version managed by nvm."
-    (string-trim (shell-command-to-string "nvm current")))
 
-  (defun set-prettier-js-command ()
-    "Set prettier-js-command based on the current Node.js version."
-    (setq prettier-js-command (concat "/home/sam/.nvm/versions/node/" (get-nvm-node-version) "/bin/prettier")))
-
-  ;; Force Spacemacs to load the correct Node version of 'Prettier':
-  (set-prettier-js-command)
-
-  ;; Add a hook to update prettier-js-command whenever Node.js version changes
-  (add-hook 'after-init-hook #'set-prettier-js-command)
-
-  ;; Taken from here:
-  ;; https://jaketrent.com/post/prettier-on-spacemacs/
-  ;; NOTE:
-  ;; This requires you to make sure that you use the following commands to grab the 'spacemacs-prettier' layer:
-  ;; cd ~/.emacs.d/private/
-  ;; git clone git@github.com:praveenperera/spacemacs-prettier.git
-  ;; Once that is done, then this config should be good to go as long as Prettier was installed globally via 'npm install -g prettier'
-  ;; which should install it within whatever version of Node is being used via 'nvm' above ^
-  ;; Force Spacemacs to add a hook for every JS based mode:
-  (add-hook 'js2-mode-hook 'prettier-js-mode)
-  (add-hook 'web-mode-hook 'prettier-js-mode)
-  (add-hook 'typescript-tsx-mode-hook 'prettier-js-mode)
-  (add-hook 'typescript-mode-hook 'prettier-js-mode)
-  ;; Force Spacemacs to use some defaults for Prettier without having to use a '.prettierrc' file:
-  (setq prettier-js-args '(
-                           "--single-quote"
-                           "--tab-width" "2"
-                           "--print-width" "80"
-                           "--bracket-same-line"
-                           ))
   ;; Force Spacemacs to have specific indentation levels for specific modes:
   (defun my/customize-indentation-for-modes ()
     "Customize indentation for specific modes"
@@ -697,10 +670,6 @@ before packages are loaded."
     :config
     (when (memq window-system '(mac ns x))
       (exec-path-from-shell-initialize)))
-  ;; Forcing Spacemacs to use Node 18 which I installed via 'nvm':
-  ;; (add-to-list 'exec-path "/home/sam/.nvm/versions/node/v18.0.0/bin")
-  ;; Forcing Spacemacs to use Node 20.8.1:
-  (add-to-list 'exec-path "/home/sam/.nvm/versions/node/v20.8.1/bin")
   ;; Forcing Spacemacs to not create lockfiles:
   (setq create-lockfiles nil)
   ;; Vterm:
