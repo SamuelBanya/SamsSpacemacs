@@ -78,13 +78,14 @@ This function should only modify configuration layer settings."
    dotspacemacs-additional-packages '(
                                       sqlite3
                                       vterm
-                                      editorconfig)
+                                      editorconfig
+                                      )
 
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
 
    ;; A list of packages that will not be installed and loaded.
-   dotspacemacs-excluded-packages '()
+   dotspacemacs-excluded-packages '(org-superstar)
 
    ;; Defines the behaviour of Spacemacs when installing packages.
    ;; Possible values are `used-only', `used-but-keep-unused' and `all'.
@@ -583,7 +584,7 @@ Put your configuration code here, except for variables that should be set
 before packages are loaded."
   ;; Setting default font size to 13 point
   (setq-default dotspacemacs-default-font '("Source Code Pro"
-                                            :size 13
+                                            :size 12
                                             :weight normal
                                             :width normal
                                             :powerline-scale 1.1))
@@ -690,9 +691,11 @@ before packages are loaded."
   (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
   ;; Get rid of 'Flyspell' as its annoying, and I don't suck at spelling:
   (setq-default dotspacemacs-checker-disable 'flyspell)
+
   ;; Org Mode Specific Config Sections:
-  ;; Disable line truncation in Org Mode
-  (setq org-startup-truncated nil)
+  ;; Destroy annoying 'bookmark-set-fringe-mark' which shows up as a weird orange mark in Org Mode
+  (setq-default bookmark-set-fringe-mark nil)
+
   ;; Wrap the entire Org Mode config sections with the following
   ;; Reason being is that the FAQ advises this (https://www.spacemacs.org/doc/FAQ.html)
   (with-eval-after-load 'org
@@ -705,12 +708,14 @@ before packages are loaded."
     (global-set-key (kbd "C-c c") 'my-org-capture)
     ;; Nuke 'org-adapt-indentation' variable setting value introduced in Emacs 27.2 so lines aren't auto-indented after headlines
     (setq org-adapt-indentation nil)
-    ;; Nuke 'org-startup-folded' variable setting value introduced in Emacs 27.2 so org docs aren't automatically expanded
-    (setq org-startup-folded t)
     ;; Add time-tracking for Org-Mode todo item state changes to place into ':LOGBOOK:' drawer
     (setq org-log-into-drawer "LOGBOOK")
+    ;; Disable line truncation in Org Mode
+    (setq org-startup-truncated nil)
     ;; Allow Org-Mode to edit SRC blocks within the same window
     (setq org-src-window-setup 'current-window)
+    ;; Nuke 'org-startup-folded' variable setting value introduced in Emacs 27.2 so org docs aren't automatically expanded
+    (setq org-startup-folded t)
     ;; Allow Org-Mode to use an emacs-lisp src block template
     (add-to-list 'org-structure-template-alist
 	               '("el" . "src emacs-lisp"))
