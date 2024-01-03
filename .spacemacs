@@ -582,6 +582,12 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
+  ;; Change iBuffer keybinding to 'C-x b'
+  (global-set-key (kbd "C-x b") 'ibuffer)
+
+  ;; Make Helm buffers appear with 'C-x C-b'
+  (global-set-key (kbd "C-x C-b") 'helm-buffers-list)
+
   ;; Setting default font size to 13 point
   (setq-default dotspacemacs-default-font '("Source Code Pro"
                                             :size 12
